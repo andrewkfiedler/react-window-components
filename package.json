@@ -1,0 +1,59 @@
+{
+  "name": "react-window-components",
+  "version": "0.0.1",
+  "description": "Helpful components built on top of react-window",
+  "author": "Andrew Fiedler <andrewkfiedler@gmail.com> (https://github.com/andrewkfiedler/)",
+  "contributors": [
+    "Andrew Fiedler <andrewkfiedler@gmail.com> (https://github.com/andrewkfiedler/)"
+  ],
+  "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/andrewkfiedler/react-window-components.git"
+  },
+  "bugs": {
+    "url": "https://github.com/andrewkfiedler/react-window-components/issues"
+  },
+  "engines": {
+    "node": ">8.0.0"
+  },
+  "keywords": [
+    "react",
+    "reactjs",
+    "virtual",
+    "window",
+    "windowed"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "copy:package": "cpx package.json dist && json -I -f dist/package.json -e 'this.private=false' && cpx \"graphql/**/!(*.tsx)\" \"dist/graphql\"",
+    "prebuild": "rimraf dist && yarn copy:package",
+    "build": "tsc",
+    "publish:npm": "yarn build && npm publish dist"
+  },
+  "dependencies": {
+    "lodash.debounce": "^4.0.8"
+  },
+  "peerDependencies": {
+    "react": "^15.0.0 || ^16.0.0",
+    "react-dom": "^15.0.0 || ^16.0.0",
+    "react-virtualized-auto-sizer": "^1.0.0",
+    "react-window": "^1.8.5"
+  },
+  "devDependencies": {
+    "@types/lodash.debounce": "^4.0.6",
+    "@types/react-virtualized-auto-sizer": "1.0.0",
+    "@types/react-window": "^1.8.1",
+    "cpx": "1.5.0",
+    "json": "^9.0.6",
+    "rimraf": "^3.0.2",
+    "pretty-quick": "2.0.1",
+    "prettier": "^2.0.5",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-virtualized-auto-sizer": "^1.0.2",
+    "react-window": "^1.8.5",
+    "typescript": "^3.8.3"
+  }
+}

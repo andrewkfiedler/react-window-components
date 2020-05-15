@@ -1,0 +1,107 @@
+Arguments: 
+  /Users/andrewfiedler/.nvm/versions/node/v10.20.1/bin/node /usr/local/Cellar/yarn/1.17.3/libexec/bin/yarn.js install
+
+PATH: 
+  /Users/andrewfiedler/.nvm/versions/node/v10.20.1/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/puppetlabs/bin:/Users/andrewfiedler/.nvm/versions/node/v10.20.1/bin:/repos/personal/cx-dotfiles/bin:/repos/personal/cx-dotfiles/bin
+
+Yarn version: 
+  1.17.3
+
+Node version: 
+  10.20.1
+
+Platform: 
+  darwin x64
+
+Trace: 
+  SyntaxError: /repos/personal/react-window-components/package.json: Unexpected token } in JSON at position 2168
+      at JSON.parse (<anonymous>)
+      at /usr/local/Cellar/yarn/1.17.3/libexec/lib/cli.js:1625:59
+      at Generator.next (<anonymous>)
+      at step (/usr/local/Cellar/yarn/1.17.3/libexec/lib/cli.js:304:30)
+      at /usr/local/Cellar/yarn/1.17.3/libexec/lib/cli.js:315:13
+
+npm manifest: 
+  {
+      "name": "react-window",
+      "version": "1.8.5",
+      "description":
+        "React components for efficiently rendering large, scrollable lists and tabular data",
+      "author":
+        "Brian Vaughn <brian.david.vaughn@gmail.com> (https://github.com/bvaughn/)",
+      "contributors": [
+        "Brian Vaughn <brian.david.vaughn@gmail.com> (https://github.com/bvaughn/)"
+      ],
+      "license": "MIT",
+      "homepage": "http://react-window.now.sh/",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/bvaughn/react-window.git"
+      },
+      "bugs": {
+        "url": "https://github.com/bvaughn/react-window/issues"
+      },
+      "engines": {
+        "node": ">8.0.0"
+      },
+      "keywords": [
+        "react",
+        "reactjs",
+        "virtual",
+        "window",
+        "windowed",
+        "list",
+        "scrolling",
+        "infinite",
+        "virtualized",
+        "table",
+        "grid",
+        "spreadsheet"
+      ],
+      "main": "dist/index.cjs.js",
+      "module": "dist/index.esm.js",
+      "files": ["dist", "src/*.js"],
+      "sideEffects": false,
+      "scripts": {
+        "flow": "flow check --max-warnings=0 src && flow check website",
+        "precommit": "lint-staged",
+        "prettier": "prettier --write '**/*.{js,json,css}'",
+        "linc": "lint-staged",
+        "lint": "eslint '**/*.js'",
+        "test": "cross-env CI=1 react-scripts test --env=jsdom",
+        "test:watch": "react-scripts test --env=jsdom",
+        "build:flow":
+          "cp flow-template dist/index.cjs.js.flow && cp flow-template dist/index.esm.js.flow",
+        "build:source": "rollup -c",
+        "build": "del dist && mkdir dist && yarn build:flow && yarn build:source",
+        "start": "rollup -c -w",
+        "prepare": "yarn run build",
+        "website:build": "cd website && yarn build",
+        "website:deploy": "cd website && yarn deploy",
+        "website:run": "cd website && yarn start"
+      },
+      "lint-staged": {
+        "{website,src}/**/*.{js,json,css}": ["prettier --write", "git add"],
+        "**/*.js": "eslint --max-warnings 0"
+      },
+      "dependencies": {
+      },
+      "peerDependencies": {
+        "react": "^15.0.0 || ^16.0.0",
+        "react-dom": "^15.0.0 || ^16.0.0",
+        "react-window": "1.8.5",
+      },
+      "devDependencies": {
+      "@types/react-window": "^1.8.1",
+        "prettier": "^2.0.5",
+        "react": "^16.8.4",
+        "react-dom": "^16.8.4",
+        "react-window": "1.8.5"
+          }
+    }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
