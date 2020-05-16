@@ -77,11 +77,23 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
   );
   const listRef = React.useRef<VariableSizeList>(null);
   const afterIndexRef = React.useRef(items.length + 1);
+  const rangeRef = React.useRef(
+    {} as {
+      [key: string]: true;
+    }
+  );
+
   const updateSizes = React.useMemo(() => {
     return _debounce(() => {
       if (listRef.current) {
-        console.log(`update: ${afterIndexRef.current}`);
-        listRef.current.resetAfterIndex(afterIndexRef.current, true);
+        const rangeStart = Object.keys(rangeRef.current)
+          .map((val) => parseInt(val))
+          .sort()[0];
+        console.log(`update: ${rangeStart} ${afterIndexRef.current}`);
+        listRef.current.resetAfterIndex(
+          Math.min(rangeStart, afterIndexRef.current),
+          true
+        );
         afterIndexRef.current = listRef.current.props.itemCount + 1;
       }
     }, updateDebounce);
@@ -103,6 +115,7 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
       };
 
       React.useLayoutEffect(() => {
+        rangeRef.current[index] = true;
         let intervalId = undefined as undefined | number;
         let firstMeasureTimeoutId = undefined as undefined | number;
         if (controlledMeasuring !== true) {
@@ -118,6 +131,7 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
         return () => {
           clearTimeout(firstMeasureTimeoutId);
           clearInterval(intervalId);
+          delete rangeRef.current[index];
         };
       }, []);
 
