@@ -121,6 +121,17 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
         };
       }, []);
 
+      React.useEffect(() => {
+        /**
+         * Regardless of mode, we should be updating cached size on resize.  This if statement though should
+         * cover most cases of controlled measuring, since it prevents updating cached size until the initial
+         * measurement is done.
+         */
+        if (cachedItemSizes.current[index] !== undefined) {
+          updateCachedSize();
+        }
+      }, [style]);
+
       return (
         <>
           <div
