@@ -43,7 +43,10 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
   Item,
   Empty,
   defaultSize = 100,
-  measureDebounce = 100,
+  controlledMeasuring = {
+    firstMeasure: 100,
+    measureDebounce: 100,
+  },
   updateDebounce = 100,
   overscanCount = 0,
 }: {
@@ -52,10 +55,16 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
     item: T;
     index: number;
     itemRef: React.RefObject<Z>;
+    measure: () => void;
   }>;
   Empty: React.ElementType<{}>;
   defaultSize?: number;
-  measureDebounce?: number;
+  controlledMeasuring:
+    | true
+    | {
+        firstMeasure?: number;
+        measureDebounce?: number;
+      };
   updateDebounce?: number;
   overscanCount?: number;
 }) {
@@ -82,6 +91,7 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
     return ({ index, style }: ListChildComponentProps) => {
       const item = items[index];
       const itemRef = React.useRef<Z>(null);
+
       const updateCachedSize = () => {
         if (itemRef.current) {
           if (cachedItemSizes.current[index] !== itemRef.current.clientHeight) {
@@ -93,11 +103,20 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
       };
 
       React.useLayoutEffect(() => {
-        updateCachedSize();
-        const intervalId = setInterval(() => {
-          updateCachedSize();
-        }, measureDebounce);
+        let intervalId = undefined as undefined | number;
+        let firstMeasureTimeoutId = undefined as undefined | number;
+        if (controlledMeasuring !== true) {
+          const { measureDebounce, firstMeasure } = controlledMeasuring;
+          firstMeasureTimeoutId = setTimeout(() => {
+            updateCachedSize();
+            intervalId = setInterval(() => {
+              updateCachedSize();
+            }, measureDebounce);
+          }, firstMeasure);
+        }
+
         return () => {
+          clearTimeout(firstMeasureTimeoutId);
           clearInterval(intervalId);
         };
       }, []);
@@ -110,7 +129,12 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
               overflow: "visible",
             }}
           >
-            <Item index={index} item={item} itemRef={itemRef} />
+            <Item
+              index={index}
+              item={item}
+              itemRef={itemRef}
+              measure={updateCachedSize}
+            />
           </div>
         </>
       );
