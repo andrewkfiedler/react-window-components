@@ -127,7 +127,7 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
         const rangeStart = Object.keys(rangeRef.current)
           .map((val) => parseInt(val))
           .sort()[0];
-        console.log(`update: ${rangeStart} ${afterIndexRef.current}`);
+        // console.log(`update: ${rangeStart} ${afterIndexRef.current}`); useful for debugging and checking if unnecessary measures are happening
         listRef.current.resetAfterIndex(
           Math.min(rangeStart, afterIndexRef.current),
           true
