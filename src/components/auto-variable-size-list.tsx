@@ -5,6 +5,7 @@ import _debounce from "lodash.debounce";
 
 /**
  * Literally just so we can add 1px to the end of the list, to account for items with borders (otherwise they get chopped)
+ * Also to inherit background, to allow setting a background higher up in the dom that we inherit.
  */
 const innerElementType = React.forwardRef(
   (
@@ -15,6 +16,7 @@ const innerElementType = React.forwardRef(
       ref={ref}
       style={{
         ...style,
+        background: "inherit",
         height: `${parseFloat(style.height) + 1}px`,
       }}
       {...rest}
@@ -49,6 +51,7 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
   },
   updateDebounce = 100,
   overscanCount = 0,
+  outerElementProps,
 }: {
   items: T[];
   Item: React.ElementType<{
@@ -67,6 +70,7 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
       };
   updateDebounce?: number;
   overscanCount?: number;
+  outerElementProps?: React.DOMAttributes<HTMLDivElement>;
 }) {
   const visibleStartIndexRef = React.useRef(0);
   const isEmpty = items.length === 0;
@@ -82,6 +86,40 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
       [key: string]: true;
     }
   );
+
+  const outerElementType = React.useMemo(() => {
+    return React.forwardRef(
+      (
+        props: {
+          children?: React.ReactNode;
+          onScroll: any;
+          style: React.CSSProperties;
+        },
+        ref: React.RefObject<HTMLDivElement>
+      ) => {
+        const { onScroll: customOnScroll, ...otherOuterElementProps } = {
+          onScroll: () => {},
+          ...outerElementProps,
+        };
+
+        return (
+          <div
+            ref={ref}
+            {...props}
+            onScroll={(e) => {
+              props.onScroll(e);
+              customOnScroll(e);
+            }}
+            style={{
+              background: "inherit",
+              ...props.style,
+            }}
+            {...otherOuterElementProps}
+          />
+        );
+      }
+    );
+  }, []);
 
   const updateSizes = React.useMemo(() => {
     return _debounce(() => {
@@ -102,6 +140,7 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
   const Row = React.useMemo(() => {
     return ({ index, style }: ListChildComponentProps) => {
       const item = items[index];
+      const firstRender = React.useRef<Boolean>(true);
       const itemRef = React.useRef<Z>(null);
 
       const updateCachedSize = () => {
@@ -141,9 +180,13 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
          * cover most cases of controlled measuring, since it prevents updating cached size until the initial
          * measurement is done.
          */
-        if (cachedItemSizes.current[index] !== undefined) {
+        if (
+          !firstRender.current &&
+          cachedItemSizes.current[index] !== undefined
+        ) {
           updateCachedSize();
         }
+        firstRender.current = false;
       }, [style]);
 
       return (
@@ -152,6 +195,7 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
             style={{
               ...style,
               overflow: "visible",
+              background: "inherit",
             }}
           >
             <Item
@@ -174,8 +218,8 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
 
   const MemoList = React.useMemo(() => {
     return (
-      <div style={{ width: "100%", height: "100%" }}>
-        <AutoSizer>
+      <div style={{ width: "100%", height: "100%", background: "inherit" }}>
+        <AutoSizer style={{ background: "inherit" }}>
           {({ height, width }) => {
             // to avoid setState within a render, push to end of stack
             setTimeout(() => {
@@ -194,6 +238,7 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
                 onItemsRendered={({ visibleStartIndex }) => {
                   visibleStartIndexRef.current = visibleStartIndex;
                 }}
+                outerElementType={outerElementType}
                 innerElementType={innerElementType}
               >
                 {Row}
