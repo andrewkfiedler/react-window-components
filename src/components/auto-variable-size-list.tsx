@@ -1,5 +1,9 @@
 import * as React from "react";
-import { VariableSizeList, ListChildComponentProps } from "react-window";
+import {
+  VariableSizeList,
+  ListChildComponentProps,
+  areEqual,
+} from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import _debounce from "lodash.debounce";
 
@@ -54,11 +58,17 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
   outerElementProps,
 }: {
   items: T[];
-  Item: React.ElementType<{
+  Item: React.FunctionComponent<{
     item: T;
     index: number;
     itemRef: React.RefObject<Z>;
     measure: () => void;
+    /**
+     * If you want to have your component do media query like things,
+     * this is your ticket.  We're already having to measure the container,
+     * so this gives you the current width (allowing you make your component respond to whatever the width is)
+     */
+    width: number;
   }>;
   Empty: React.ElementType<{}>;
   defaultSize?: number;
@@ -137,21 +147,27 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
     }, updateDebounce);
   }, []);
 
+  const MemoItem = React.memo(Item);
+
   const Row = React.useMemo(() => {
-    return ({ index, style }: ListChildComponentProps) => {
+    return React.memo(({ index, style, data }: ListChildComponentProps) => {
       const item = items[index];
       const firstRender = React.useRef<Boolean>(true);
       const itemRef = React.useRef<Z>(null);
 
-      const updateCachedSize = () => {
-        if (itemRef.current) {
-          if (cachedItemSizes.current[index] !== itemRef.current.clientHeight) {
-            cachedItemSizes.current[index] = itemRef.current.clientHeight;
-            afterIndexRef.current = Math.min(index, afterIndexRef.current);
-            updateSizes();
+      const updateCachedSize = React.useMemo(() => {
+        return () => {
+          if (itemRef.current) {
+            if (
+              cachedItemSizes.current[index] !== itemRef.current.clientHeight
+            ) {
+              cachedItemSizes.current[index] = itemRef.current.clientHeight;
+              afterIndexRef.current = Math.min(index, afterIndexRef.current);
+              updateSizes();
+            }
           }
-        }
-      };
+        };
+      }, []);
 
       React.useLayoutEffect(() => {
         rangeRef.current[index] = true;
@@ -187,7 +203,7 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
           updateCachedSize();
         }
         firstRender.current = false;
-      }, [style]);
+      }, [data.width]);
 
       return (
         <>
@@ -198,16 +214,17 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
               background: "inherit",
             }}
           >
-            <Item
+            <MemoItem
               index={index}
               item={item}
               itemRef={itemRef}
               measure={updateCachedSize}
+              width={data.width}
             />
           </div>
         </>
       );
-    };
+    }, areEqual);
   }, [items]);
 
   const getItemSize = React.useMemo(() => {
@@ -240,6 +257,9 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
                 }}
                 outerElementType={outerElementType}
                 innerElementType={innerElementType}
+                itemData={{
+                  width,
+                }}
               >
                 {Row}
               </VariableSizeList>
