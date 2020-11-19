@@ -56,6 +56,7 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
   updateDebounce = 100,
   overscanCount = 0,
   outerElementProps,
+  outerRef,
 }: {
   items: T[];
   Item: React.FunctionComponent<{
@@ -81,6 +82,7 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
   updateDebounce?: number;
   overscanCount?: number;
   outerElementProps?: React.DOMAttributes<HTMLDivElement>;
+  outerRef?: React.RefObject<any>;
 }) {
   const visibleStartIndexRef = React.useRef(0);
   const isEmpty = items.length === 0;
@@ -249,6 +251,7 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
             return (
               <VariableSizeList
                 ref={listRef}
+                outerRef={outerRef}
                 height={height}
                 width={width}
                 itemCount={items.length}
