@@ -2,6 +2,7 @@ import * as React from "react";
 import {
   VariableSizeList,
   ListChildComponentProps,
+  ListProps,
   areEqual,
 } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
@@ -82,7 +83,7 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
   updateDebounce?: number;
   overscanCount?: number;
   outerElementProps?: React.DOMAttributes<HTMLDivElement>;
-  outerRef?: React.RefObject<any>;
+  outerRef: ListProps["outerRef"];
 }) {
   const visibleStartIndexRef = React.useRef(0);
   const isEmpty = items.length === 0;
