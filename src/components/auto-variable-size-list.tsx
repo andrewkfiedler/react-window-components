@@ -83,7 +83,7 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
   updateDebounce?: number;
   overscanCount?: number;
   outerElementProps?: React.DOMAttributes<HTMLDivElement>;
-  outerRef: ListProps["outerRef"];
+  outerRef?: ListProps["outerRef"];
 }) {
   const visibleStartIndexRef = React.useRef(0);
   const isEmpty = items.length === 0;
