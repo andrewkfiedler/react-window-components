@@ -229,7 +229,9 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
 
   const getItemSize = React.useMemo(() => {
     return (index: number) => {
-      return cachedItemSizes.current[index] || defaultSize;
+      return cachedItemSizes.current[index] === undefined
+        ? defaultSize
+        : cachedItemSizes.current[index];
     };
   }, []);
 
