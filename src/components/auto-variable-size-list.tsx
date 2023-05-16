@@ -4,6 +4,7 @@ import {
   ListChildComponentProps,
   ListProps,
   areEqual,
+  VariableSizeListProps,
 } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import _debounce from "lodash.debounce";
@@ -58,6 +59,7 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
   overscanCount = 0,
   outerElementProps,
   outerRef,
+  variableSizeListRef,
 }: {
   items: T[];
   Item: React.FunctionComponent<{
@@ -84,6 +86,10 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
   overscanCount?: number;
   outerElementProps?: React.DOMAttributes<HTMLDivElement>;
   outerRef?: ListProps["outerRef"];
+  /**
+   *  If you want to have access to the list to do fancy things like scrollToItem.
+   */
+  variableSizeListRef?: React.MutableRefObject<VariableSizeList | null>;
 }) {
   const visibleStartIndexRef = React.useRef(0);
   const isEmpty = items.length === 0;
@@ -92,7 +98,7 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
       [key: string]: number;
     }
   );
-  const listRef = React.useRef<VariableSizeList>(null);
+  const listRef = React.useRef<VariableSizeList | null>(null);
   const afterIndexRef = React.useRef(items.length + 1);
   const rangeRef = React.useRef(
     {} as {
@@ -251,7 +257,12 @@ export function AutoVariableSizeList<T, Z extends HTMLElement>({
 
             return (
               <VariableSizeList
-                ref={listRef}
+                ref={(ref) => {
+                  listRef.current = ref;
+                  if (variableSizeListRef) {
+                    variableSizeListRef.current = ref;
+                  }
+                }}
                 outerRef={outerRef}
                 height={height}
                 width={width}
